@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} Book - ShelfSpace{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-white">
+    <div class="max-w-7xl mx-auto px-8 py-8">
+        <!-- Quote Section -->
+        <div class="bg-emerald-50 rounded-lg p-6 mb-12">
+            <div class="flex items-start">
+                <div class="text-emerald-700 mr-4">
+                    <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10.5h8m-8 4h8M9.5 4.5h5a2 2 0 012 2v11a2 2 0 01-2 2h-5a2 2 0 01-2-2v-11a2 2 0 012-2z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-medium text-emerald-800 mb-1">TODAY'S QUOTE</h3>
+                    <p class="text-emerald-900 text-lg italic">"{{ quote.text }}"</p>
+                    <p class="text-emerald-700 mt-2">— {{ quote.author }}{% if quote.book_title %}, {{ quote.book_title }}{% endif %}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="bg-white rounded-lg">
+            <h1 class="text-2xl font-bold text-gray-900 mb-8">{% if form.instance.pk %}Edit{% else %}Add{% endif %} Book</h1>
+
+            {% if not form.instance.pk %}
+            <!-- Search Section -->
+            <div class="mb-8 pb-8 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">Search for a Book</h2>
+                <form method="get" class="space-y-4">
+                    <div class="flex gap-4">
+                        <input type="text" name="q" value="{{ search_query }}" placeholder="Search by title, author, or ISBN..." class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500">
+                        <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                            Search
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            {% if search_results %}
+            <!-- Search Results -->
+            <div class="mb-8 pb-8 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">Search Results</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for book in search_results %}
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="aspect-w-2 aspect-h-3 mb-4">
+                            {% if book.cover_url %}
+                            <img src="{{ book.cover_url }}" alt="{{ book.title }}" class="object-cover rounded-lg shadow-sm">
+                            {% else %}
+                            <div class="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
+                                <span class="text-gray-400">No cover</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <h3 class="text-sm font-medium text-gray-900">{{ book.title }}</h3>
+                        <p class="text-sm text-gray-500">{{ book.author }}</p>
+                        <form method="post" class="mt-4">
+                            {% csrf_token %}
+                            <input type="hidden" name="title" value="{{ book.title }}">
+                            <input type="hidden" name="author" value="{{ book.author }}">
+                            <input type="hidden" name="cover_url" value="{{ book.cover_url }}">
+                            <input type="hidden" name="isbn13" value="{{ book.isbn13 }}">
+                            <button type="submit" name="select_book" class="w-full px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                                Select
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            {% endif %}
+
+            <!-- Manual Form -->
+            <div>
+                <h2 class="text-lg font-medium text-gray-900 mb-4">{% if form.instance.pk %}Edit Book Details{% else %}Add Book Manually{% endif %}</h2>
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div>
+                            <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-700">Title</label>
+                            {{ form.title|add_class:"mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm" }}
+                        </div>
+                        <div>
+                            <label for="{{ form.author.id_for_label }}" class="block text-sm font-medium text-gray-700">Author</label>
+                            {{ form.author|add_class:"mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm" }}
+                        </div>
+                        <div>
+                            <label for="{{ form.total_pages.id_for_label }}" class="block text-sm font-medium text-gray-700">Total Pages</label>
+                            {{ form.total_pages|add_class:"mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm" }}
+                        </div>
+                        <div>
+                            <label for="{{ form.status.id_for_label }}" class="block text-sm font-medium text-gray-700">Status</label>
+                            {{ form.status|add_class:"mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm" }}
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label for="{{ form.cover_url.id_for_label }}" class="block text-sm font-medium text-gray-700">Cover URL (optional)</label>
+                            {{ form.cover_url|add_class:"mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm" }}
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label for="{{ form.notes.id_for_label }}" class="block text-sm font-medium text-gray-700">Notes (optional)</label>
+                            {{ form.notes|add_class:"mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm" }}
+                        </div>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                            {% if form.instance.pk %}Save Changes{% else %}Add Book{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

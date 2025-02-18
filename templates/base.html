@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ShelfSpace{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="h-full bg-white text-gray-900">
+    <!-- Navigation -->
+    <nav class="border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="{% url 'landing' %}" class="text-xl font-medium text-gray-900 flex items-center">
+                        <svg class="h-8 w-8 text-emerald-600" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M21,2H3A2,2 0 0,0 1,4V20A2,2 0 0,0 3,22H21A2,2 0 0,0 23,20V4A2,2 0 0,0 21,2M12,4.5L19.5,8V20H4.5V8L12,4.5Z" />
+                        </svg>
+                        <span class="ml-2 font-semibold">ShelfSpace</span>
+                    </a>
+                </div>
+                {% if user.is_authenticated %}
+                <div class="flex items-center space-x-4">
+                    <form method="GET" action="{% url 'bookshelf' %}" class="w-96">
+                        <div class="relative">
+                            <input type="search" name="q" value="{{ request.GET.q }}" class="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Search by title, author, or notes...">
+                            <button type="submit" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500">
+                                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                    <form method="post" action="{% url 'logout' %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="text-gray-600 hover:text-gray-900">Log Out</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    {% block content %}{% endblock %}
+
+    {% if messages %}
+    <div class="fixed bottom-0 right-0 m-8">
+        {% for message in messages %}
+        <div class="bg-white rounded-lg shadow-lg p-4 mb-4 {% if message.tags %}{{ message.tags }}{% endif %}">
+            <p class="text-sm text-gray-700">{{ message }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</body>
+</html>

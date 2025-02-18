@@ -1,0 +1,46 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./templates/**/*.html",
+    "./static/**/*.js",
+  ],
+  safelist: [
+    'bg-emerald-600',
+    'hover:bg-emerald-700',
+    'text-white',
+    'bg-emerald-50',
+    'text-emerald-700',
+    'text-emerald-800',
+    'text-emerald-900',
+    'bg-emerald-500',
+    'focus:ring-emerald-500',
+    'focus:border-emerald-500',
+    'shadow-sm',
+    'shadow-md',
+    'inline-flex',
+    'items-center',
+    'justify-center',
+    'space-x-4',
+    'focus:outline-none',
+    'focus:ring-2',
+    'focus:ring-offset-2',
+    'w-full',
+    'py-2',
+    'py-3',
+    'px-4',
+    'px-5',
+    'border',
+    'border-transparent',
+    'text-sm',
+    'font-medium',
+    'rounded-md',
+    'rounded-lg'
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [
+    require('@tailwindcss/typography'),
+    require('@tailwindcss/forms'),
+  ],
+}

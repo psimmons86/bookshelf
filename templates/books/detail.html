@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ book.title }} - ShelfSpace{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-white">
+    <div class="max-w-7xl mx-auto px-8 py-8">
+        <!-- Quote Section -->
+        <div class="bg-emerald-50 rounded-lg p-6 mb-12">
+            <div class="flex items-start">
+                <div class="text-emerald-700 mr-4">
+                    <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10.5h8m-8 4h8M9.5 4.5h5a2 2 0 012 2v11a2 2 0 01-2 2h-5a2 2 0 01-2-2v-11a2 2 0 012-2z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-medium text-emerald-800 mb-1">TODAY'S QUOTE</h3>
+                    <p class="text-emerald-900 text-lg italic">"{{ quote.text }}"</p>
+                    <p class="text-emerald-700 mt-2">— {{ quote.author }}{% if quote.book_title %}, {{ quote.book_title }}{% endif %}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Book Details -->
+        <div class="lg:grid lg:grid-cols-3 lg:gap-8">
+            <!-- Book Cover -->
+            <div class="lg:col-span-1">
+                {% if book.cover_url %}
+                <img src="{{ book.cover_url }}" alt="{{ book.title }}" class="w-full rounded-lg shadow-md">
+                {% else %}
+                <div class="w-full aspect-[3/4] bg-gray-100 rounded-lg flex items-center justify-center">
+                    <span class="text-gray-400">No cover available</span>
+                </div>
+                {% endif %}
+                <div class="mt-6">
+                    <h3 class="text-lg font-medium text-gray-900">Reading Progress</h3>
+                    <div class="mt-4">
+                        <div class="relative pt-1">
+                            <div class="overflow-hidden h-2 text-xs flex rounded bg-gray-200">
+                                <div style="width: {{ book.progress }}%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-emerald-500"></div>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-600 mt-2">
+                                <span>Page {{ book.current_page }} of {{ book.total_pages }}</span>
+                                <span class="font-medium">{{ book.progress }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <form method="post" action="{% url 'update_progress' book.id %}" class="space-y-4">
+                            {% csrf_token %}
+                            <div>
+                                <label for="current_page" class="block text-sm font-medium text-gray-700">Current Page</label>
+                                <input type="number" name="current_page" id="current_page" value="{{ book.current_page }}" min="0" max="{{ book.total_pages }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm">
+                            </div>
+                            <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                                Update Progress
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Book Info -->
+            <div class="mt-8 lg:mt-0 lg:col-span-2">
+                <div class="space-y-6">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900">{{ book.title }}</h1>
+                        <p class="mt-2 text-xl text-gray-600">by {{ book.author }}</p>
+                    </div>
+                    <div class="border-t border-gray-200 pt-6">
+                        <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Status</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ book.get_status_display }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Pages</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ book.total_pages }}</dd>
+                            </div>
+                            {% if book.started_at %}
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Started Reading</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ book.started_at|date:"F j, Y" }}</dd>
+                            </div>
+                            {% endif %}
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Last Updated</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ book.updated_at|date:"F j, Y" }}</dd>
+                            </div>
+                            {% if book.isbn13 %}
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">ISBN-13</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ book.isbn13 }}</dd>
+                            </div>
+                            {% endif %}
+                        </dl>
+                    </div>
+                    {% if book.notes %}
+                    <div class="border-t border-gray-200 pt-6">
+                        <h3 class="text-lg font-medium text-gray-900">Notes</h3>
+                        <div class="mt-2 prose prose-emerald">
+                            {{ book.notes|linebreaks }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="border-t border-gray-200 pt-6">
+                        <div class="flex justify-end space-x-4">
+                            <a href="{% url 'edit_book' book.id %}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                                Edit Book
+                            </a>
+                            <form method="post" action="{% url 'delete_book' book.id %}" class="inline">
+                                {% csrf_token %}
+                                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                    Delete Book
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
