@@ -23,7 +23,7 @@ A modern bookshelf application built with Django and Tailwind CSS.
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/bookshelf.git
+git clone https://github.com/psimmons86/bookshelf.git
 cd bookshelf
 ```
 
